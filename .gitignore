@@ -1,0 +1,15 @@
+# Local build and sensitive files
+.DS_Store
+*.log
+.env
+.env.*
+.idea/
+.vscode/
+node_modules/
+vendor/
+*.zip
+*.csv
+wp-content/uploads/
+
+__pycache__/
+*.pyc

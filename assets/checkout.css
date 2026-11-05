@@ -1,0 +1,596 @@
+.crmp-checkout,
+.crmp-block {
+    border: 1px solid #e6e2ef;
+    background: #faf9ff;
+    border-radius: 10px;
+    padding: 18px;
+    margin: 10px 0
+}
+
+.crmp-checkout h3 {
+    margin-top: 0
+}
+
+.crmp-receiver {
+    background: #f0ecff;
+    border-radius: 8px;
+    padding: 14px;
+    margin: 12px 0
+}
+
+.crmp-receiver strong {
+    display: block
+}
+
+.crmp-receiver code {
+    font-size: 16px;
+    color: #34237a
+}
+
+.crmp-qr img {
+    max-width: 160px;
+    height: auto
+}
+
+.crmp-checkout label,
+.crmp-block label {
+    display: block;
+    font-weight: 600;
+    margin: 12px 0
+}
+
+.crmp-checkout input[type=text],
+.crmp-block input[type=text] {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    margin: 6px 0
+}
+
+.crmp-hint {
+    font-size: 12px;
+    color: #64528f
+}
+
+.crmp-checkout,
+.crmp-evidence {
+    background: #fff;
+    border: 1px solid #e3e0ee;
+    border-radius: 12px;
+    padding: 18px;
+    margin: 16px 0
+}
+
+.crmp-checkout select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #cfc9df;
+    border-radius: 8px;
+    margin: 10px 0
+}
+
+.crmp-method-preview,
+.crmp-receiver {
+    background: #f6f4ff;
+    border-radius: 10px;
+    padding: 14px;
+    margin: 12px 0
+}
+
+.crmp-qr img {
+    max-width: 155px;
+    height: auto
+}
+
+.crmp-hint {
+    font-size: 13px;
+    color: #605a70
+}
+
+.crmp-evidence input[type=text],
+.crmp-evidence input[type=file] {
+    display: block;
+    width: 100%;
+    margin-top: 8px
+}
+
+.crmp-notice {
+    background: #f2edff;
+    padding: 12px;
+    border-radius: 8px
+}
+
+/* Explicit select metrics prevent themes clipping option text. */
+.crmp-checkout select#crmp_method,
+.crmp-block select {
+    display: block !important;
+    box-sizing: border-box !important;
+    min-height: 48px !important;
+    height: auto !important;
+    line-height: 1.5 !important;
+    padding: 12px 38px 12px 14px !important;
+    color: #24202d !important;
+    background-color: #fff !important;
+    font-size: 15px !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    appearance: none !important;
+    -webkit-appearance: none !important;
+}
+
+.crmp-checkout select#crmp_method option {
+    color: #24202d;
+    background: #fff;
+    line-height: 1.5;
+    padding: 8px;
+}
+
+.crmp-checkout-proof {
+    margin-top: 16px;
+    border-top: 1px solid #e8e4f0;
+    padding-top: 12px
+}
+
+.crmp-checkout-proof input[type=file] {
+    max-width: 100%;
+    width: 100%;
+    margin: 8px 0
+}
+
+.crmp-checkout-proof label {
+    margin-top: 12px
+}
+
+.crmp-submitted {
+    border-color: #b8dfc3;
+    background: #f5fff8
+}
+
+.crmp-proof-feedback {
+    padding: 12px 14px;
+    margin: 12px 0;
+    border-radius: 6px;
+    font-weight: 500
+}
+
+.crmp-proof-error {
+    background: #fff0f0;
+    color: #8b1820;
+    border: 1px solid #f0b6b6
+}
+
+.crmp-proof-success {
+    background: #eaf7ed;
+    color: #176532;
+    border: 1px solid #addbbb
+}
+
+.crmp-verification-details {
+    display: grid;
+    grid-template-columns: minmax(130px, 180px) 1fr;
+    gap: 10px 16px;
+    margin: 16px 0 0
+}
+
+.crmp-verification-details dt {
+    font-weight: 600
+}
+
+.crmp-verification-details dd {
+    margin: 0;
+    overflow-wrap: anywhere
+}
+
+.crmp-status-verified {
+    border-left: 4px solid #16803c;
+    padding: 18px;
+    background: #f0faf3
+}
+
+.crmp-status-pending {
+    border-left: 4px solid #b27a08;
+    padding: 18px;
+    background: #fffaf0
+}
+
+.crmp-verification-history {
+    margin-top: 24px
+}
+
+/* Customer-facing payment verification panel */
+.crmp-payment-panel {
+    box-sizing: border-box;
+    max-width: 1000px;
+    margin: 28px auto 34px;
+    padding: 0;
+    background: #fff;
+    border: 1px solid #e8e4e8;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(42, 20, 32, .055);
+    color: #302832;
+    font-size: 15px;
+    line-height: 1.6
+}
+
+.crmp-payment-panel * {
+    box-sizing: border-box
+}
+
+.crmp-payment-head {
+    display: flex;
+    align-items: flex-start;
+    gap: 17px;
+    padding: 28px 30px;
+    background: #faf7f9;
+    border-bottom: 1px solid #eee7ec
+}
+
+.crmp-payment-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: #f0e3eb;
+    color: #790d37;
+    font-weight: 700;
+    font-size: 24px
+}
+
+.crmp-payment-eyebrow {
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .12em;
+    color: #7b6170;
+    margin-bottom: 5px
+}
+
+.crmp-payment-head h2 {
+    font-size: 25px;
+    line-height: 1.25;
+    color: #3e1427;
+    margin: 0 0 6px !important;
+    font-weight: 700
+}
+
+.crmp-payment-head p {
+    margin: 0;
+    color: #655b63
+}
+
+.crmp-state-verified .crmp-payment-icon {
+    background: #dcf5e5;
+    color: #146d3b
+}
+
+.crmp-state-rejected .crmp-payment-icon {
+    background: #ffebea;
+    color: #a32b28
+}
+
+.crmp-state-pending .crmp-payment-icon {
+    background: #fff1d5;
+    color: #906000
+}
+
+.crmp-payment-facts {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    padding: 23px 30px;
+    border-bottom: 1px solid #f0edf0
+}
+
+.crmp-payment-facts>div,
+.crmp-payment-result>div {
+    min-width: 0
+}
+
+.crmp-payment-facts > div > span,
+.crmp-payment-result > div > span,
+.crmp-payment-account > div > span {
+    display: block;
+    font-size: 12px;
+    color: #80737c;
+    margin-bottom: 3px
+}
+
+.crmp-payment-facts strong,
+.crmp-payment-result strong {
+    display: block;
+    font-size: 15px;
+    color: #35252d;
+    overflow-wrap: anywhere
+}
+
+.crmp-payment-result {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 17px;
+    padding: 24px 30px
+}
+
+.crmp-reviewer-note {
+    margin: 0 30px 26px;
+    border-left: 4px solid #9e2843;
+    background: #fff6f6;
+    padding: 15px 18px;
+    border-radius: 0 8px 8px 0
+}
+
+.crmp-reviewer-note strong {
+    display: block;
+    color: #762139
+}
+
+.crmp-reviewer-note p {
+    margin: 6px 0 0;
+    white-space: normal;
+    overflow-wrap: anywhere
+}
+
+.crmp-state-verified .crmp-reviewer-note {
+    background: #f1faf5;
+    border-left-color: #27915a
+}
+
+.crmp-payment-transfer,
+.crmp-payment-proof {
+    padding: 24px 30px;
+    border-bottom: 1px solid #eee7ec
+}
+
+.crmp-payment-transfer h3,
+.crmp-payment-proof h3 {
+    font-size: 19px;
+    margin: 0 0 6px;
+    color: #3e1427
+}
+
+.crmp-payment-transfer>p,
+.crmp-payment-proof>p {
+    margin: 0 0 15px
+}
+
+.crmp-payment-account {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding: 18px;
+    background: #faf7f9;
+    border-radius: 10px
+}
+
+.crmp-payment-account strong {
+    display: block;
+    margin-bottom: 8px;
+    overflow-wrap: anywhere
+}
+
+.crmp-payment-account .button,
+.crmp-payment-submit {
+    background: #780d34 !important;
+    border-color: #780d34 !important;
+    color: #fff !important;
+    border-radius: 7px !important;
+    padding: 10px 18px !important;
+    min-height: 42px !important
+}
+
+.crmp-payment-qr {
+    margin-top: 15px
+}
+
+.crmp-payment-qr span {
+    display: block;
+    font-size: 12px;
+    color: #71636d
+}
+
+.crmp-payment-qr img {
+    max-width: 150px;
+    height: auto;
+    border-radius: 8px
+}
+
+.crmp-payment-instructions {
+    margin-top: 14px !important
+}
+
+.crmp-payment-fields {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px
+}
+
+.crmp-payment-fields label {
+    display: block;
+    font-weight: 600
+}
+
+.crmp-payment-fields small {
+    font-weight: 400;
+    color: #7c7077
+}
+
+.crmp-payment-fields input {
+    width: 100%;
+    margin-top: 7px;
+    min-height: 42px;
+    border: 1px solid #ddd5db;
+    border-radius: 7px;
+    padding: 9px;
+    background: #fff
+}
+
+.crmp-payment-disclaimer {
+    font-size: 12px;
+    color: #7d707a;
+    margin: 12px 0 0 !important
+}
+
+.crmp-payment-panel .crmp-hint {
+    margin: 10px 0 !important;
+    color: #77616d
+}
+
+@media(max-width:640px) {
+    .crmp-payment-head {
+        padding: 22px 18px
+    }
+
+    .crmp-payment-head h2 {
+        font-size: 21px
+    }
+
+    .crmp-payment-facts,
+    .crmp-payment-result {
+        grid-template-columns: 1fr 1fr;
+        padding: 18px
+    }
+
+    .crmp-payment-fields {
+        grid-template-columns: 1fr
+    }
+
+    .crmp-payment-transfer,
+    .crmp-payment-proof {
+        padding: 20px 18px
+    }
+
+    .crmp-reviewer-note {
+        margin: 0 18px 20px
+    }
+
+    .crmp-payment-account {
+        align-items: flex-start;
+        flex-direction: column
+    }
+}
+
+/* Keep customer status, rejection notes and proof controls inside narrow themes. */
+.crmp-payment-panel { width: 100%; min-width: 0; }
+.crmp-payment-head > div { min-width: 0; overflow-wrap: anywhere; }
+.crmp-payment-account > div, .crmp-payment-fields > label { min-width: 0; }
+.crmp-payment-panel input { min-width: 0; max-width: 100%; }
+.crmp-payment-panel .crmp-payment-submit { max-width: 100%; white-space: normal; }
+@media(max-width:380px) {
+    .crmp-payment-facts, .crmp-payment-result { grid-template-columns: 1fr; }
+    .crmp-payment-head { gap: 10px; }
+}
+
+@media(max-width:640px) {
+    .crmp-payment-result { grid-template-columns: 1fr; }
+}
+.crmp-state-verified .crmp-reviewer-note strong { color: #146d3b; }
+
+/* One plugin-owned select arrow; suppress native/theme duplicate backgrounds. */
+.crmp-checkout select#crmp_method, .crmp-block select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='9' viewBox='0 0 14 9'%3E%3Cpath d='M1 1l6 6 6-6' fill='none' stroke='%2324202d' stroke-width='1.5'/%3E%3C/svg%3E") !important; background-repeat:no-repeat !important; background-position:right 14px center !important; background-size:14px 9px !important; }
+.crmp-method-preview[hidden], .crmp-method-info[hidden] { display:none !important; }
+
+/* Labels and copy controls wrap within narrow checkout columns. */
+.crmp-checkout .crmp-receiving-field, .crmp-block .crmp-receiving-field { margin: 0 0 14px; min-width:0; }
+.crmp-checkout .crmp-receiving-label, .crmp-block .crmp-receiving-label { display:block; font-size:12px; font-weight:600; line-height:1.5; margin-bottom:4px; }
+.crmp-checkout .crmp-receiving-field strong, .crmp-block .crmp-receiving-field strong { display:block; overflow-wrap:anywhere; }
+.crmp-checkout .crmp-account-copy { display:flex; align-items:center; flex-wrap:wrap; gap:8px 12px; min-width:0; }
+.crmp-checkout .crmp-account-copy code { white-space:normal; overflow-wrap:anywhere; max-width:100%; }
+.crmp-checkout .crmp-account-copy .button { max-width:100%; white-space:normal; }
+.crmp-checkout .crmp-qr { margin:14px 0; }
+.crmp-checkout .crmp-qr img { display:block; max-width:100%; height:auto; }
+
+/* Inherit store identity; never change the surrounding theme header, footer or typography. */
+.crmp-payment-panel { --crmp-brand:var(--e-global-color-primary,var(--wp--preset--color--primary,var(--crmp-brand-fallback,#3858e9))); max-width:800px; padding:24px; border-radius:20px; color:inherit; font-family:inherit; box-shadow:none; }
+.crmp-proof-brand { display:flex; justify-content:flex-end; margin:0 0 12px; }
+.crmp-proof-badge { align-self:flex-end; border-radius:20px; background:#fff3d6; color:#704c00; padding:4px 12px; font-size:12px; font-weight:600; }
+.crmp-state-rejected .crmp-proof-badge { background:#ffebeb; color:#9b2020; }
+.crmp-state-verified .crmp-proof-badge { background:#e7f6ed; color:#146d3b; }
+.crmp-payment-panel .crmp-payment-head { padding:0 0 20px; background:transparent; border-bottom:1px solid #eee; }
+.crmp-payment-panel .crmp-payment-icon { background:transparent; color:var(--crmp-brand); }
+.crmp-payment-panel .crmp-payment-head h2 { color:inherit; font-size:24px; }
+.crmp-payment-panel .crmp-payment-facts { padding:20px 0; }
+.crmp-customer-summary { display:flex; justify-content:space-between; gap:18px; padding:0 0 16px; overflow-wrap:anywhere; }
+.crmp-customer-summary strong { text-align:end; min-width:0; }
+.crmp-payment-panel .crmp-payment-result { padding:12px 0 22px; }
+.crmp-payment-panel .crmp-reviewer-note { margin:0 0 24px; border:0; border-radius:12px; background:#fbefef; padding:18px; }
+.crmp-payment-panel .crmp-payment-transfer { padding:20px 0; }
+.crmp-payment-panel .crmp-payment-proof { padding:20px 0 0; border:0; margin:0; }
+.crmp-payment-panel .crmp-proof-label { display:block; margin:14px 0 7px; font-weight:600; }
+.crmp-payment-panel select#crmp-proof-method { appearance:auto; -webkit-appearance:auto; background:#fff; background-image:none; border:1px solid #d8d8dc; border-radius:10px; width:100%; max-width:100%; min-height:48px; padding:10px 14px; margin:0 0 18px; font:inherit; color:inherit; }
+.crmp-payment-panel .crmp-payment-fields { grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; }
+.crmp-payment-panel .crmp-payment-fields input,.crmp-payment-panel textarea { width:100%; border:1px solid #d8d8dc; border-radius:10px; min-height:48px; padding:12px; font:inherit; color:inherit; background:#fff; }
+.crmp-payment-panel textarea { resize:vertical; max-width:100%; }
+.crmp-payment-panel .crmp-proof-upload { display:block; margin-top:18px; }
+.crmp-upload-surface { position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; padding:22px 12px; margin-top:8px; min-height:144px; border:1px dashed #c9c9d0; border-radius:12px; text-align:center; overflow-wrap:anywhere; }
+.crmp-upload-surface input[type=file] { position:absolute; inset:0; width:100%; height:100%; opacity:0; cursor:pointer; }
+.crmp-upload-surface:focus-within { outline:2px solid var(--crmp-brand); outline-offset:3px; }
+.crmp-upload-icon { font-size:28px; line-height:1; }
+.crmp-payment-panel .crmp-proof-confirm { display:flex; align-items:flex-start; gap:10px; margin:18px 0; font-weight:400; cursor:pointer; }
+.crmp-proof-confirm input[type=checkbox] { flex:none; width:20px; height:20px; margin:3px 0 0; accent-color:var(--crmp-brand); }
+.crmp-payment-panel .crmp-payment-submit,.crmp-payment-panel .crmp-payment-account .button { background:var(--crmp-brand) !important; border-color:var(--crmp-brand) !important; }
+.crmp-payment-panel .crmp-payment-submit { display:block; width:100%; border-radius:12px !important; min-height:48px !important; font:inherit; font-weight:600; }
+.crmp-payment-panel .crmp-payment-disclaimer,.crmp-proof-footer { text-align:center; }
+.crmp-proof-footer { padding:20px 0 0; margin:0; color:#666; font-size:12px; }
+.crmp-proof-footer small { display:block; margin-top:6px; }
+.crmp-payment-panel [hidden] { display:none !important; }
+@media(max-width:640px) { .crmp-payment-panel { padding:18px; border-radius:14px; } .crmp-payment-panel .crmp-payment-fields { grid-template-columns:minmax(0,1fr); } .crmp-payment-panel .crmp-payment-facts { grid-template-columns:minmax(0,1fr); } .crmp-payment-panel .crmp-payment-result { grid-template-columns:minmax(0,1fr); } }
+
+/* Matching proof-card design in Classic and Block checkout, scoped to this gateway. */
+.crmp-checkout,.crmp-block { --crmp-brand:var(--e-global-color-primary,var(--wp--preset--color--primary,var(--crmp-brand-fallback,#3858e9))); box-sizing:border-box; min-width:0; max-width:100%; border:1px solid #e2e2e6; border-radius:16px; padding:20px; background:#fff; color:inherit; font-family:inherit; line-height:1.6; }
+.crmp-checkout *,.crmp-block * { box-sizing:border-box; }
+.crmp-checkout>p:first-child,.crmp-block>p:first-child { margin:0 0 16px; }
+.crmp-checkout label,.crmp-block label { color:inherit; font-weight:600; font-size:inherit; }
+.crmp-checkout select#crmp_method,.crmp-block select { min-height:48px; border-radius:10px; border-color:#d8d8dc; font-family:inherit; }
+.crmp-checkout .crmp-method-preview,.crmp-checkout .crmp-receiver { padding:16px; border-radius:12px; background:#f7f7f9; }
+.crmp-checkout .crmp-account-copy code,.crmp-block .crmp-receiving-field { color:inherit; }
+.crmp-checkout .crmp-account-copy .button { background:var(--crmp-brand); border:1px solid var(--crmp-brand); color:#fff; border-radius:8px; padding:8px 14px; font:inherit; }
+.crmp-checkout .crmp-checkout-proof,.crmp-block .crmp-checkout-proof { margin-top:20px; padding-top:20px; border-top:1px solid #e5e5e9; }
+.crmp-checkout-proof h3 { font-size:17px; color:inherit; margin:0 0 14px; line-height:1.5; }
+.crmp-checkout-proof small { font-weight:400; }
+.crmp-checkout .crmp-checkout-proof input[type=text],.crmp-block .crmp-checkout-proof input[type=text] { width:100%; min-width:0; max-width:100%; min-height:48px; padding:12px; margin:8px 0 18px; border:1px solid #d8d8dc; border-radius:10px; background:#fff; color:inherit; font:inherit; }
+.crmp-checkout .crmp-proof-upload,.crmp-block .crmp-proof-upload { display:block; margin:16px 0; }
+.crmp-checkout .crmp-upload-surface input[type=file],.crmp-block .crmp-upload-surface input[type=file] { position:absolute; inset:0; margin:0; padding:0; opacity:0; width:100%; height:100%; cursor:pointer; }
+.crmp-checkout .crmp-upload-surface,.crmp-block .crmp-upload-surface { min-width:0; max-width:100%; }
+.crmp-checkout .crmp-upload-name,.crmp-block .crmp-upload-name { max-width:100%; overflow-wrap:anywhere; }
+.crmp-checkout .crmp-hint,.crmp-block .crmp-hint,.crmp-checkout-disclaimer { font-size:12px; line-height:1.6; color:inherit; opacity:.8; margin:12px 0 0; }
+.crmp-checkout-disclaimer { border-top:1px solid #ededf0; padding-top:12px; }
+.crmp-checkout input:focus-visible,.crmp-block input:focus-visible,.crmp-checkout select:focus-visible,.crmp-block select:focus-visible { outline:2px solid var(--crmp-brand); outline-offset:2px; }
+@media(max-width:480px) { .crmp-checkout,.crmp-block { padding:16px; border-radius:12px; } .crmp-checkout .crmp-upload-surface,.crmp-block .crmp-upload-surface { padding:20px 10px; } }
+.crmp-proof-receiving { margin:0 0 20px; padding:16px; border:1px solid #e5e5e9; border-radius:12px; background:#fafafa; }
+.crmp-proof-receiving h4 { margin:12px 0; font-size:15px; color:inherit; }
+.crmp-proof-receiving .crmp-payment-account { padding:0; background:transparent; flex-wrap:wrap; }
+.crmp-proof-receiving .crmp-payment-account .button { max-width:100%; white-space:normal; }
+.crmp-proof-receiving .crmp-payment-qr { display:flex; flex-direction:column; align-items:center; gap:8px; text-align:center; margin-top:18px; }
+.crmp-proof-receiving .crmp-payment-qr img { display:block; width:auto; max-width:min(180px,100%); height:auto; border-radius:8px; }
+.crmp-proof-receiving .crmp-payment-qr small { font-size:12px; color:#666; }
+.crmp-checkout .crmp-qr { text-align:center; }
+.crmp-checkout .crmp-qr img { width:180px; max-width:100%; height:auto; margin:8px auto; }
+.crmp-checkout .crmp-checkout-proof input[type=date],.crmp-block .crmp-checkout-proof input[type=date],.crmp-checkout .crmp-checkout-proof textarea,.crmp-block .crmp-checkout-proof textarea { display:block; box-sizing:border-box; width:100%; min-width:0; max-width:100%; min-height:48px; margin:8px 0 18px; padding:12px; border:1px solid #d8d8dc; border-radius:10px; background:#fff; color:inherit; font:inherit; }
+.crmp-checkout .crmp-checkout-proof textarea,.crmp-block .crmp-checkout-proof textarea { resize:vertical; }
+/* Native mobile date controls fit the form and avoid focus zoom on iOS. */
+.crmp-payment-panel input[type=date],.crmp-checkout input[type=date],.crmp-block input[type=date] { box-sizing:border-box; min-width:0; width:100%; max-width:100%; min-height:48px; font-size:16px; line-height:1.5; }
+.crmp-payment-panel input[type=date]::-webkit-date-and-time-value,.crmp-checkout input[type=date]::-webkit-date-and-time-value,.crmp-block input[type=date]::-webkit-date-and-time-value { text-align:start; }
+.crmp-pending-summary { padding:18px; margin:18px 0; border:1px solid #e2e2e6; border-radius:12px; background:#fafafa; overflow-wrap:anywhere; }
+.crmp-pending-summary p { margin:10px 0; }
+.crmp-payment-panel .crmp-proof-toggle { display:block; width:100%; min-height:48px; padding:12px 16px; white-space:normal; border-radius:10px; border:1px solid var(--crmp-brand); background:var(--crmp-brand); color:#fff; font:inherit; font-weight:600; }
+.crmp-payment-panel .crmp-proof-cancel { margin-top:12px; max-width:100%; min-height:44px; padding:10px 16px; white-space:normal; border:1px solid #d8d8dc; border-radius:8px; background:#fff; color:inherit; font:inherit; }
+
+/* Keep short prompts readable inside narrow theme checkout columns. */
+.crmp-payment-panel select#crmp-proof-method,.crmp-checkout select#crmp_method,.crmp-block select { box-sizing:border-box; min-width:0; width:100%; max-width:100%; padding:10px 32px 10px 12px; text-overflow:ellipsis; }
+.crmp-payment-panel .crmp-payment-fields>label { min-width:0; }
+@media(max-width:480px) {
+ .crmp-checkout,.crmp-block { padding:12px; }
+ .crmp-payment-panel .crmp-payment-fields input,.crmp-checkout .crmp-checkout-proof input[type=text],.crmp-block .crmp-checkout-proof input[type=text],.crmp-payment-panel select#crmp-proof-method,.crmp-checkout select#crmp_method,.crmp-block select { font-size:16px; line-height:1.5; }
+ .crmp-payment-panel .crmp-payment-fields input::placeholder,.crmp-checkout input::placeholder,.crmp-block input::placeholder { font-size:14px; }
+}
+
+.crmp-copy-feedback { display:block; flex-basis:100%; font-size:12px; overflow-wrap:anywhere; }
+.crmp-payment-fields.crmp-fields-single { grid-template-columns:minmax(0,1fr); }
+.crmp-checkout .crmp-proof-confirm,.crmp-block .crmp-proof-confirm { display:flex; align-items:flex-start; gap:10px; font-weight:400; }
+.crmp-checkout .crmp-proof-confirm input,.crmp-block .crmp-proof-confirm input { flex:none; width:20px; height:20px; margin:3px 0 0; }
+
+.crmp-upload-feedback{margin:8px 0 14px;padding:10px 12px;border-left:3px solid #2271b1;background:#f0f6fc;color:#1d2327;font-size:13px;line-height:1.6;overflow-wrap:anywhere}.crmp-upload-feedback[data-state=ready],.crmp-upload-feedback[data-state=selected],.crmp-upload-feedback[data-state=submitted]{border-left-color:#008a20;background:#f0f8f1}.crmp-upload-feedback[data-state=error]{border-left-color:#b32d2e;background:#fcf0f1}.crmp-upload-progress{display:block;width:100%;height:8px;margin-top:8px;accent-color:var(--crmp-brand,#3858e9)}.crmp-upload-feedback[hidden],.crmp-upload-progress[hidden]{display:none!important}

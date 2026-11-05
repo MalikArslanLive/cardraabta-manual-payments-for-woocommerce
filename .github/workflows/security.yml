@@ -1,0 +1,243 @@
+name: Security and WordPress checks
+on:
+  push:
+    branches: [main]
+    paths-ignore: ['**/*.md']
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      cache_only:
+        description: Run only the PHP 8.3 / Nginx public-cache regression
+        type: boolean
+        default: false
+  release:
+    types: [published]
+permissions:
+  contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  wordpress:
+    name: ${{ inputs.cache_only == true && 'Targeted public cache-hit check' || format('WordPress PHP {0} / {1} / {2} / {3}', matrix.php, matrix.server, matrix.wordpress, matrix.database) }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ${{ fromJSON(inputs.cache_only == true && '["8.3"]' || '["8.1","8.2","8.3","8.4","8.5"]') }}
+        server: ${{ fromJSON(inputs.cache_only == true && '["nginx"]' || '["apache2","nginx"]') }}
+        wordpress: ['latest']
+        woocommerce: ['latest']
+        database: ['mysql']
+        include: >-
+          ${{ fromJSON(inputs.cache_only == true && '[]' || '[{"php":"8.1","server":"nginx","wordpress":"6.5","woocommerce":"8.3.0","database":"mysql"},{"php":"8.5","server":"nginx","wordpress":"latest","woocommerce":"latest","database":"mariadb"}]') }}
+      max-parallel: 12
+    env:
+      WP_CLI_ALLOW_ROOT: '1'
+      CRMP_WP_PATH: /tmp/crmp-wp
+      NODE_PATH: /tmp/crmp-browser/node_modules
+      CRMP_PHP_VERSION: ${{ matrix.php }}
+      CRMP_WEB_SERVER: ${{ matrix.server }}
+    services:
+      mysql:
+        image: ${{ matrix.database == 'mariadb' && 'mariadb:10.11' || 'mysql:8.0' }}
+        env:
+          MYSQL_ROOT_PASSWORD: test-only
+          MYSQL_DATABASE: crmp_test
+        ports: ['3306:3306']
+        options: >-
+          --health-cmd="mysqladmin ping -ptest-only || mariadb-admin ping -ptest-only"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: mysqli, openssl, fileinfo, mbstring
+          coverage: none
+          ini-values: opcache.enable_cli=0, opcache.jit=0
+      - name: Syntax and reproducible release package
+        run: |
+          set -euo pipefail
+          while IFS= read -r -d '' file; do php -l "$file"; done < <(find . -name '*.php' -not -path './.git/*' -print0)
+          for file in assets/*.js; do node --check "$file"; done
+          python3 tools/build-release.py
+      - name: Isolated WordPress installation
+        run: |
+          set -euo pipefail
+          exec > >(tee /tmp/crmp-setup.log) 2>&1
+          trap 'tail -n 8 /tmp/crmp-setup.log | while IFS= read -r line; do line="${line//%/%25}"; line="${line//$'"'"'\r'"'"'/%0D}"; echo "::error title=WordPress setup failed::$line"; done' ERR
+          curl -fsSL https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar -o /tmp/wp.phar
+          php /tmp/wp.phar core download --version="${{ matrix.wordpress }}" --path="$CRMP_WP_PATH"
+          php /tmp/wp.phar config create --path="$CRMP_WP_PATH" --dbname=crmp_test --dbuser=root --dbpass=test-only --dbhost=127.0.0.1:3306
+          php /tmp/wp.phar config set DISABLE_WP_CRON true --raw --path="$CRMP_WP_PATH"
+          php /tmp/wp.phar core install --path="$CRMP_WP_PATH" --url=http://127.0.0.1:8089 --title=CRMP-Test --admin_user=auditor --admin_password=test-only-local --admin_email=audit@example.test --skip-email
+          woo_version=()
+          if [[ '${{ matrix.woocommerce }}' != latest ]]; then woo_version=(--version='${{ matrix.woocommerce }}'); fi
+          php /tmp/wp.phar plugin install woocommerce "${woo_version[@]}" --activate --path="$CRMP_WP_PATH"
+          php /tmp/wp.phar plugin install plugin-check --activate --path="$CRMP_WP_PATH"
+          mkdir -p "$CRMP_WP_PATH/wp-content/mu-plugins"
+          cp tests/test-site.php "$CRMP_WP_PATH/wp-content/mu-plugins/crmp-test.php"
+          unzip -oq release-assets/cardraabta-manual-payments-for-woocommerce-v1.0.0.zip -d "$CRMP_WP_PATH/wp-content/plugins"
+          php /tmp/wp.phar plugin activate cardraabta-manual-payments-for-woocommerce --path="$CRMP_WP_PATH"
+      - name: Payment, privacy, locks, history, emails and HPOS
+        if: inputs.cache_only != true
+        run: |
+          set -euo pipefail
+          exec > >(tee /tmp/crmp-regression.log) 2>&1
+          trap '(grep -E "^FAIL |Fatal error|Uncaught|AssertionError|RuntimeException|Error:" /tmp/crmp-regression.log || tail -n 8 /tmp/crmp-regression.log) | while IFS= read -r line; do line="${line//%/%25}"; line="${line//$'"'"'\r'"'"'/%0D}"; echo "::error title=Regression failed::$line"; done' ERR
+          for test in public-store-audit admin-regression final-audit closed-submissions lock-integration release-lifecycle security-regression extended-security evidence-capabilities asset-cache checkout-mode hardening-regression release-regression email-regression email-log-regression; do
+            php /tmp/wp.phar eval-file "tests/$test.php" --path="$CRMP_WP_PATH"
+          done
+          if php /tmp/wp.phar cli has-command 'wc hpos sync' --path="$CRMP_WP_PATH"; then
+            php /tmp/wp.phar wc hpos sync --path="$CRMP_WP_PATH"
+          else
+            php /tmp/wp.phar wc cot sync --path="$CRMP_WP_PATH"
+          fi
+          php /tmp/wp.phar option update woocommerce_custom_orders_table_enabled yes --path="$CRMP_WP_PATH"
+          for test in hardening-regression release-regression email-regression email-log-regression; do
+            php /tmp/wp.phar eval-file "tests/$test.php" --path="$CRMP_WP_PATH"
+          done
+      - name: Real HTTP, mobile layouts and browser interactions
+        if: inputs.cache_only != true
+        run: |
+          set -euo pipefail
+          exec > >(tee /tmp/crmp-http.log) 2>&1
+          trap 'tail -n 12 /tmp/crmp-http.log | while IFS= read -r line; do line="${line//%/%25}"; echo "::error title=HTTP tests failed::$line"; done' ERR
+          pip install requests beautifulsoup4
+          mkdir -p /tmp/crmp-browser
+          cp tools/ci/browser/package*.json /tmp/crmp-browser/
+          npm ci --ignore-scripts --prefix /tmp/crmp-browser
+          /tmp/crmp-browser/node_modules/.bin/playwright install --with-deps chromium
+          php /tmp/wp.phar option update siteurl http://127.0.0.1:8089 --path="$CRMP_WP_PATH"
+          php /tmp/wp.phar option update home http://127.0.0.1:8089 --path="$CRMP_WP_PATH"
+          php /tmp/wp.phar user update auditor --user_pass=test-only-local --role=administrator --path="$CRMP_WP_PATH"
+          bash tools/ci/start-web.sh
+          for test in release-http email-http email-log-http; do python3 "tests/$test.py"; done
+          for test in release-dom admin-audit-dom email-dom email-log-dom checkout-copy-dom customer-form-dom; do node "tests/$test.cjs"; done
+          php /tmp/wp.phar eval-file tests/checkout-design.php --path="$CRMP_WP_PATH"
+          php /tmp/wp.phar eval-file tests/export-fields-fixture.php --path="$CRMP_WP_PATH"
+          python3 tests/export-fields-http.py
+          php /tmp/wp.phar eval-file tests/proof-policy.php --path="$CRMP_WP_PATH"
+          node tests/proof-policy-dom.cjs
+          node tests/checkout-mode-dom.cjs
+          node tests/checkout-design-dom.cjs
+          php /tmp/wp.phar eval-file tests/proof-limit.php --path="$CRMP_WP_PATH"
+          node tests/proof-limit-dom.cjs
+          node tests/release-responsive.cjs
+          python3 tests/proof-limit-http.py
+      - name: Real server privacy and runtime verification
+        if: inputs.cache_only != true
+        run: |
+          set -euo pipefail
+          exec > >(tee /tmp/crmp-server-security.log) 2>&1
+          trap 'sleep 0.2; tail -n 14 /tmp/crmp-server-security.log | while IFS= read -r line; do line="${line//%/%25}"; echo "::error title=Server verification::$line"; done' ERR
+          php /tmp/wp.phar eval-file tests/server-security.php --path="$CRMP_WP_PATH"
+          node tests/checkout-upload-browser.cjs
+          python3 tests/server-security-http.py
+          python3 tests/performance-probe.py
+      - name: Bootstrap only the failing public-cache probe
+        if: inputs.cache_only == true
+        run: |
+          pip install requests beautifulsoup4
+          bash tools/ci/start-web.sh
+      - name: Real optimization, page cache and persistent object cache compatibility
+        if: matrix.php == '8.3' && matrix.server == 'nginx' && matrix.wordpress == 'latest' && matrix.database == 'mysql'
+        env:
+          CRMP_CACHE_ONLY: ${{ inputs.cache_only == true && '1' || '0' }}
+        run: |
+          set -euo pipefail
+          exec > >(tee /tmp/crmp-optimization.log) 2>&1
+          trap '(grep -E "^FAIL |AssertionError|Fatal error|Uncaught|RuntimeException|Error:" /tmp/crmp-optimization.log || tail -n 14 /tmp/crmp-optimization.log) | while IFS= read -r line; do line="${line//%/%25}"; echo "::error title=Optimization compatibility::$line"; done' ERR
+          bash tools/ci/optimization.sh
+      - name: Official Plugin Check including runtime checks
+        if: inputs.cache_only != true
+        run: |
+          set -euo pipefail
+          php /tmp/wp.phar plugin check cardraabta-manual-payments-for-woocommerce --format=strict-json --path="$CRMP_WP_PATH" --require="$CRMP_WP_PATH/wp-content/plugins/plugin-check/cli.php" | tee /tmp/crmp-plugin-check.log
+          python3 tools/ci/check-plugin-report.py /tmp/crmp-plugin-check.log
+      - uses: actions/upload-artifact@v6
+        if: always()
+        with:
+          name: verification-php-${{ matrix.php }}-${{ matrix.server }}-wp-${{ matrix.wordpress }}-${{ matrix.database }}
+          path: |
+            release-assets/*v1.0.0.zip
+            /tmp/crmp-plugin-check.log
+            /tmp/crmp-optimization.log
+            /tmp/crmp-optimization-fixture.json
+            local-runtime/responsive/*.png
+            /tmp/crmp-web-*.log
+            /tmp/crmp-runtime-versions.json
+            /tmp/crmp-latency.json
+            /tmp/crmp-server-security.log
+          if-no-files-found: ignore
+
+  openlitespeed:
+    if: inputs.cache_only != true
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      WP_CLI_ALLOW_ROOT: '1'
+      CRMP_WP_PATH: /tmp/crmp-wp
+      NODE_PATH: /tmp/crmp-browser/node_modules
+      CRMP_WEB_SERVER: openlitespeed
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: test-only
+          MYSQL_DATABASE: crmp_test
+        ports: ['3306:3306']
+        options: >-
+          --health-cmd="mysqladmin ping -ptest-only"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+    steps:
+      - uses: actions/checkout@v6
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mysqli, openssl, fileinfo, mbstring
+          coverage: none
+      - name: Prepare latest stable WordPress and WooCommerce
+        run: |
+          set -euo pipefail
+          curl -fsSL https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar -o /tmp/wp.phar
+          php /tmp/wp.phar core download --path="$CRMP_WP_PATH"
+          php /tmp/wp.phar config create --path="$CRMP_WP_PATH" --dbname=crmp_test --dbuser=root --dbpass=test-only --dbhost=127.0.0.1:3306
+          php /tmp/wp.phar config set DISABLE_WP_CRON true --raw --path="$CRMP_WP_PATH"
+          php /tmp/wp.phar core install --path="$CRMP_WP_PATH" --url=http://127.0.0.1:8089 --title=CRMP-Test --admin_user=auditor --admin_password=test-only-local --admin_email=audit@example.test --skip-email
+          php /tmp/wp.phar plugin install woocommerce plugin-check --activate --path="$CRMP_WP_PATH"
+          mkdir -p "$CRMP_WP_PATH/wp-content/mu-plugins"
+          cp tests/test-site.php "$CRMP_WP_PATH/wp-content/mu-plugins/crmp-test.php"
+          python3 tools/build-release.py
+          unzip -oq release-assets/cardraabta-manual-payments-for-woocommerce-v1.0.0.zip -d "$CRMP_WP_PATH/wp-content/plugins"
+          php /tmp/wp.phar plugin activate cardraabta-manual-payments-for-woocommerce --path="$CRMP_WP_PATH"
+          pip install requests beautifulsoup4
+          mkdir -p /tmp/crmp-browser
+          cp tools/ci/browser/package*.json /tmp/crmp-browser/
+          npm ci --ignore-scripts --prefix /tmp/crmp-browser
+          /tmp/crmp-browser/node_modules/.bin/playwright install --with-deps chromium
+      - name: LSAPI payment, security, uploads, browser and Plugin Check
+        run: |
+          set -euo pipefail
+          exec > >(tee /tmp/crmp-ols-tests.log) 2>&1
+          trap '(grep -E "^FAIL |Fatal error|Uncaught|AssertionError|RuntimeException|Error:" /tmp/crmp-ols-tests.log || tail -n 16 /tmp/crmp-ols-tests.log) | while IFS= read -r line; do line="${line//%/%25}"; echo "::error title=OpenLiteSpeed tests::$line"; done' ERR
+          bash tools/ci/openlitespeed.sh
+      - uses: actions/upload-artifact@v6
+        if: always()
+        with:
+          name: openlitespeed-evidence
+          path: |
+            /tmp/crmp-runtime-versions.json
+            /tmp/crmp-latency.json
+            /tmp/crmp-ols-tests.log
+            /tmp/crmp-ols-error.log
+            local-runtime/responsive/*.png
+
