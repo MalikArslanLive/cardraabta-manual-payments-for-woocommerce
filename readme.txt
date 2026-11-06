@@ -1,6 +1,6 @@
 === CardRaabta Manual Payments for WooCommerce ===
 Contributors: malikarslan
-Tags: manual payments, bank transfer, woocommerce, payment gateway, payment proof
+Tags: manual payments, bank transfer, woocommerce, payment proof, raast
 Requires at least: 6.5
 Tested up to: 7.1
 Requires PHP: 8.1
@@ -9,11 +9,11 @@ Stable tag: 1.0.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Accept manual bank, wallet and Raast transfers in WooCommerce. No payment gateway merchant account or API keys required.
+Accept manual bank, wallet and Raast payments in WooCommerce. Collect payment proof without a gateway merchant account or API keys.
 
 == Description ==
 
-Add your receiving bank or wallet details, accept external PKR transfers and review customer payment proof. Use an account that can receive transfers; no provider API keys or merchant integration are needed. Verify actual funds before approving an order.
+Set up manual payments for PKR orders. Display your bank account, mobile wallet or Raast receiving details at checkout, then collect screenshots or transaction references for review. Use an account that can receive transfers; no provider API keys or merchant integration are needed. Verify actual funds before approving an order.
 
 Independent third-party software; not affiliated with or endorsed by payment providers or WooCommerce. No bank/wallet API integration, automatic fund verification, card processing or automatic refunds.
 
@@ -99,5 +99,5 @@ GPL-2.0-or-later. The complete GPL v2 text is included in LICENSE.
 
 == Support ==
 
-Issues: https://github.com/MalikArslanLive/cardraabta-manual-payments-for-woocommerce/issues
+[Source code](https://github.com/MalikArslanLive/cardraabta-manual-payments-for-woocommerce) · [Report an issue](https://github.com/MalikArslanLive/cardraabta-manual-payments-for-woocommerce/issues)
 Share versions and redacted steps. Keep credentials and customer data private.
