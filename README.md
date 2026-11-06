@@ -2,13 +2,11 @@
 
 **Version 1.0.0** · Developed by [Malik Arslan](https://malikarslan.com/).
 
-A WordPress plugin for manual WooCommerce payments.
+Accept manual bank transfers, mobile wallet payments and Raast payments in WooCommerce. Customers submit payment proof at checkout or from their order page, and store managers verify the transfer before marking the order paid.
 
-[WordPress.org listing](https://wordpress.org/plugins/cardraabta-manual-payments-for-woocommerce/) · [Source and support](https://github.com/MalikArslanLive/cardraabta-manual-payments-for-woocommerce) · [Latest installable release](https://github.com/MalikArslanLive/cardraabta-manual-payments-for-woocommerce/releases/tag/v1.0.0)
+[WordPress.org listing](https://wordpress.org/plugins/cardraabta-manual-payments-for-woocommerce/) · [Report an issue](https://github.com/MalikArslanLive/cardraabta-manual-payments-for-woocommerce/issues) · [Latest installable release](https://github.com/MalikArslanLive/cardraabta-manual-payments-for-woocommerce/releases/tag/v1.0.0)
 
-Download the [final 1.0.0 plugin ZIP](https://github.com/MalikArslanLive/cardraabta-manual-payments-for-woocommerce/releases/download/v1.0.0/cardraabta-manual-payments-for-woocommerce-v1.0.0.zip). GitHub source archives include development files.
-
-Accept manual bank, wallet and Raast transfers in WooCommerce. No payment gateway merchant account or API keys required.
+Download the [installable v1.0.0 ZIP](https://github.com/MalikArslanLive/cardraabta-manual-payments-for-woocommerce/releases/download/v1.0.0/cardraabta-manual-payments-for-woocommerce-v1.0.0.zip). GitHub source archives include development files.
 
 ## Description
 
