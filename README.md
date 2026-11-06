@@ -124,52 +124,6 @@ When using Remove Unused CSS, safelist CardRaabta selectors/classes/IDs matching
 
 Representative integration checks use Autoptimize (aggregate/minify/defer/inline CSS), WP Super Cache with WooCommerce/private-page exclusions, and Redis Object Cache on a disposable PHP 8.3/Nginx stack. Standalone transforms cover Terser, Lightning CSS, a PurgeCSS safelist, delayed asset delivery, and gzip/Brotli byte round trips. The release report records the checks verified for this release. These scenarios do not certify every commercial cache plugin, unsafelisted CSS removal, arbitrary script reordering or a live Cloudflare account. A CDN must respect private/no-store headers and explicit commerce bypass rules; compression does not replace access control.
 
-## Frequently asked questions
-
-### Does this automatically verify transfers?
-
-No. Check the actual funds in your receiving account before approving payment. The plugin does not connect to payment-provider APIs.
-
-### Is payment proof required at checkout?
-
-Yes, by default. Merchants can allow unpaid/On hold orders with empty proof and later submission. Any actual submission must meet its configured rules.
-
-### Can I accept a reference without a screenshot?
-
-Yes. Enable Reference and make it Required; disable Screenshot or leave it optional. Keep at least one proof option enabled. If both are optional, each submission still needs one.
-
-### Can checkout and order-page fields differ?
-
-Yes. Configure them separately or reuse checkout settings. Screenshot and date are required by default; reference, note and confirmation start disabled.
-
-### Can customers replace payment proof?
-
-Pending/Rejected proof can be replaced under the same transaction ID. Earlier versions remain in manager-only history. The default limit is 3 updates between completed reviews; choose 1–10. Paid orders cannot resubmit.
-
-### Are screenshots included in CSV exports?
-
-Exports contain attachment IDs, not image files or public URLs. Authorized managers view private screenshots from the dashboard.
-
-### What do Closed at and Paid through transaction mean?
-
-Closed at records when a sibling submission was closed because its order was paid. Paid through transaction identifies the winning ledger record; it is blank if no matching receipt is known.
-
-### Why does an email say accepted but not arrive?
-
-Mail-transport acceptance is not inbox delivery. Check SMTP/provider logs and the recipient spam folder. Scheduled reminders depend on Action Scheduler/WP-Cron.
-
-### Can I use caching or minification?
-
-Exclude private commerce pages and endpoints from page caches, preserve script dependencies, and safelist dynamic crmp- / crmp_ CSS. See the GitHub deployment instructions.
-
-### What happens when I uninstall?
-
-Plugin records, settings, encrypted evidence and its key are retained. Deactivation cancels scheduled email work. Use manager-approved proof deletion before uninstalling if needed; minimal receipts remain for duplicate-payment protection.
-
-### What license applies?
-
-GPL-2.0-or-later. The unmodified official GNU GPL v2 text is included in LICENSE; the plugin permits version 2 or any later version. The FSF copyright and example names belong to that standard license document; plugin authorship is identified in the plugin header.
-
 ## Installation
 
 1. Minimum supported: WordPress 6.5, PHP 8.1 and WooCommerce 8.3; MySQL/MariaDB named locks and OpenSSL are required. Use the latest stable WordPress/WooCommerce updates for new installations.
