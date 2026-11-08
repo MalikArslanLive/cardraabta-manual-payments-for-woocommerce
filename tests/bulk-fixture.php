@@ -1,0 +1,2 @@
+<?php
+wp_set_current_user(1);global $wpdb;$prefix='BULK-AUDIT-'.wp_rand();$ids=array();for($i=0;$i<25;$i++){$wpdb->insert(crmp_table(),array('order_id'=>99999777,'method'=>'bank','amount'=>'10','currency'=>'PKR','status'=>'pending','transaction_ref'=>$prefix.'-'.$i,'submitted_at'=>current_time('mysql')));$ids[]=(int)$wpdb->insert_id;}delete_user_option(1,'crmp_transactions_per_page');file_put_contents('/tmp/crmp-bulk-fixture.json',wp_json_encode(array('prefix'=>$prefix,'ids'=>$ids)));

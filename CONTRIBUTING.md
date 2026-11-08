@@ -1,0 +1,13 @@
+# Contributing
+
+Use WordPress Coding Standards. Do not commit payment screenshots, transaction CSV exports, credentials, customer details, or WordPress uploads. Changes must be reviewed for authorization, CSRF, SQL injection, output escaping, and secure evidence handling. Test both WooCommerce classic and Blocks checkout, PHP compatibility, and payment review transitions. Report security issues privately.
+
+Build the production-only ZIP with `python3 tools/build-release.py` and preserve source/ZIP byte parity. The release workflow covers the declared minimum and current supported runtimes. Plugin Check must report zero errors/warnings: its default CLI exit status alone is insufficient; use the strict report gate in `tools/ci/check-plugin-report.py`. Keep dynamic proof states in CSS safelists and verify private commerce pages remain uncached.
+
+Keep README, WordPress readme FAQs and release notes consistent with actual behavior. Do not change the GPL license text or remove retained evidence/audit data as part of uninstall without a separately reviewed deletion design. Version headers and Stable tag must agree. Documentation-only changes do not require repeating unrelated payment tests; validate changed files, package integrity and relevant checks.
+
+The security workflow defaults to the full Linux matrix plus the separate native Windows/IIS guard test. Use `linux_only` for all 13 Linux configurations without repeating IIS, or `iis_only` for focused native guard validation. `retry_failed_matrix` runs complete suites for the four PHP 8.5/cache configurations; the older narrow retry inputs remain available. All plugin integration runs enable WP_DEBUG and require an existing, empty debug log. The IIS test requires URL Authorization and site-level delegation in its disposable runner; it verifies actual PHP FastCGI guard creation and HTTP denial, not a full IIS checkout.
+
+The uninstall-retention regression invokes the real uninstall hook with `--deactivate --skip-delete`, verifies retained ledger/settings/key/evidence and cancelled scheduled mail, then reactivates and decrypts the same evidence. Run this only on disposable WordPress fixtures. Keep production uninstall retention unchanged unless deletion is explicitly designed and reviewed.
+
+Keep `docs/HOSTING-SETUP.md`, the admin Setup Guide URL and the README deployment examples consistent. This guide is opened only by a manager clicking the external menu link; admin page loads must not fetch documentation or send customer/payment data. For navigation/documentation-only changes, check the actual menu order, capability visibility, new-tab/opener protection, mobile layout, documentation links, scanners and package integrity.
