@@ -1,0 +1,33 @@
+<?php
+require_once __DIR__."/proof-policy-fixture.php";crmp_test_flexible_policy();
+if(!defined('ABSPATH'))exit;
+function cf_check($name,$ok){if(!$ok)throw new RuntimeException('FAIL CUSTOMER FORM '.$name);echo 'PASS CUSTOMER FORM '.$name."\n";}
+wp_set_current_user(1);global $wpdb;
+$original=get_option('crmp_email_settings',null);delete_option('crmp_email_settings');$defaults=crmp_email_config();foreach(crmp_email_catalog() as $id=>$type)if($type[1]==='customer')cf_check('customer default ON '.$id,$defaults['enabled'][$id]);if($original!==null)update_option('crmp_email_settings',$original);
+$original_methods=get_option('crmp_method_config',array());update_option('crmp_method_config',array('bank'=>array('enabled'=>'yes','account'=>'TEST-IBAN','title'=>'Test Bank'),'jazzcash'=>array('enabled'=>'yes','account'=>'03000000000')));
+$o=ce_order();$id=ce_row($o);$row=crmp_get_transaction($id);
+$policy=crmp_test_flexible_policy();$policy['confirmation_required']=true;update_option('crmp_proof_policy',$policy);
+cf_check('confirmation required',is_wp_error(crmp_customer_proof_details($o,array('crmp_proof_ui'=>1))));
+cf_check('unknown method blocked',is_wp_error(crmp_customer_proof_details($o,array('crmp_proof_method'=>'evil'))));
+cf_check('invalid calendar date blocked',is_wp_error(crmp_customer_proof_details($o,array('crmp_payment_date'=>'2026-02-30'))));
+cf_check('future date blocked',is_wp_error(crmp_customer_proof_details($o,array('crmp_payment_date'=>'2999-01-01'))));
+cf_check('oversized note blocked',is_wp_error(crmp_customer_proof_details($o,array('crmp_customer_note'=>str_repeat('x',2001)))));
+$d=crmp_customer_proof_details($o,array('crmp_proof_ui'=>1,'crmp_proof_confirm'=>1,'crmp_proof_method'=>'jazzcash','crmp_payment_date'=>'2026-01-01','crmp_customer_note'=>'<script>x</script>Receipt supplied'));
+cf_check('note sanitized and selected method valid',!is_wp_error($d)&&$d['method']==='jazzcash'&&!str_contains($d['customer_note'],'<script>'));
+cf_check('replacement accepts method date and note',crmp_replace_pending_proof($o,$id,1,'FORM-'.wp_rand(),null,$d)===true);$current=crmp_get_transaction($id);$o=wc_get_order($o->get_id());
+cf_check('same ID current method date note stored',$current->method==='jazzcash'&&$current->payment_date==='2026-01-01'&&$current->customer_note===$d['customer_note']&&(int)$current->proof_version===2);
+cf_check('order matches new reviewable method',crmp_reviewable_order($o,$current));
+$history=$wpdb->get_row($wpdb->prepare('SELECT * FROM %i WHERE transaction_id=%d ORDER BY id DESC LIMIT 1',$wpdb->prefix.'crmp_proof_revisions',$id));cf_check('old method archived',$history->method==='bank');
+wp_set_current_user(0);$_GET['key']=$o->get_order_key();ob_start();crmp_render_payment_evidence($o);$html=ob_get_clean();
+cf_check('one accessible payment dropdown and no radios',substr_count($html,'id="crmp-proof-method"')===1&&!str_contains($html,'type="radio"'));
+cf_check('brand and order panel with anchor',str_contains($html,'id="crmp-payment-proof"')&&str_contains($html,'crmp-proof-brand'));
+cf_check('date note file and declaration rendered',str_contains($html,'name="crmp_payment_date"')&&str_contains($html,'name="crmp_customer_note"')&&str_contains($html,'name="crmp_proof_confirm"')&&str_contains($html,'crmp-upload-surface'));
+cf_check('guest email links target proof card',str_ends_with(crmp_email_order_url($o,'customer_rejected'),'#crmp-payment-proof'));
+file_put_contents('/tmp/crmp-customer-form.html',$html);
+$_GET['key']='wrong';ob_start();crmp_render_payment_evidence($o);cf_check('wrong guest key shows no private form',ob_get_clean()==='');
+wp_set_current_user(1);cf_check('reject new proof',crmp_review_transaction($id,'rejected','Test reason',2)===true);delete_transient('crmp_replace_'.$id);$next=crmp_customer_proof_details($o,array('crmp_proof_method'=>'bank','crmp_customer_note'=>'New note','crmp_payment_date'=>'2026-01-01','crmp_proof_confirm'=>'1'));
+cf_check('rejected resubmission keeps ID',crmp_replace_pending_proof($o,$id,2,'SECOND-'.wp_rand(),null,$next)===true);
+$history=$wpdb->get_row($wpdb->prepare('SELECT * FROM %i WHERE transaction_id=%d ORDER BY id DESC LIMIT 1',$wpdb->prefix.'crmp_proof_revisions',$id));cf_check('previous method date note preserved in history',$history->method==='jazzcash'&&$history->payment_date==='2026-01-01'&&$history->customer_note===$d['customer_note']&&$history->review_note==='Test reason');
+crmp_review_transaction($id,'rejected','Done',3);crmp_manage_transaction($id,'trash');crmp_manage_transaction($id,'delete');cf_check('permanent purge removes customer note and date',crmp_get_transaction($id)->customer_note===''&&crmp_get_transaction($id)->payment_date===''&&crmp_get_transaction($id)->field_policy===''&&crmp_get_transaction($id)->customer_confirmed===''&&crmp_get_transaction($id)->proof_context==='');
+update_option('crmp_method_config',$original_methods);wp_set_current_user(1);
+echo "RESULT: CUSTOMER FORM CHECKS PASSED\n";

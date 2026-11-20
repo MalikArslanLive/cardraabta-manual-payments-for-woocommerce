@@ -1,0 +1,48 @@
+const {chromium}=require('playwright');
+const assert=require('assert/strict');
+(async()=>{
+ const browser=await chromium.launch({headless:true});
+ try{
+  const page=await browser.newPage();
+  page.on('dialog',d=>d.dismiss());
+  const installReader=()=>{window.readers=[];window.FileReader=class{constructor(){window.readers.push(this);}readAsDataURL(){}abort(){this.aborted=true;}complete(value){this.result=value;if(this.onload)this.onload();}};};
+  const file=name=>({name,mimeType:'image/png',buffer:Buffer.from('fixture-'+name)});
+  await page.setContent('<form class="checkout"><input type="radio" name="payment_method" value="crmp_manual" checked><div class="crmp-checkout"><input name="crmp_screenshot" type="file"></div></form>');
+  await page.addScriptTag({path:'/tmp/crmp-wp/wp-includes/js/jquery/jquery.min.js'});
+  await page.evaluate(installReader);await page.addScriptTag({path:'assets/checkout.js'});
+  const input=page.locator('input[type=file]');
+  await input.setInputFiles(file('first.png'));
+  assert.equal(await page.evaluate(()=>jQuery('form.checkout').triggerHandler('checkout_place_order_crmp_manual')),false,'classic checkout waits for the active reader');
+  await input.setInputFiles(file('second.png'));
+  assert.equal(await page.evaluate(()=>readers[0].aborted),true);
+  await page.evaluate(()=>readers[0].complete('data:image/png;base64,OLD'));
+  assert.equal(await page.locator('[name=crmp_screenshot_data]').count(),0,'stale first file must not be attached');
+  await page.evaluate(()=>readers[1].complete('data:image/png;base64,NEW'));
+  assert.equal(await page.locator('[name=crmp_screenshot_data]').inputValue(),'data:image/png;base64,NEW');
+  assert.notEqual(await page.evaluate(()=>jQuery('form.checkout').triggerHandler('checkout_place_order_crmp_manual')),false);
+  await input.setInputFiles(file('third.png'));await input.setInputFiles([]);
+  await page.evaluate(()=>readers[2].complete('data:image/png;base64,CLEARED'));
+  assert.equal(await page.locator('[name=crmp_screenshot_data]').count(),0,'clearing selection cannot revive stale proof');
+  await input.setInputFiles(file('broken.png'));await page.evaluate(()=>readers[3].onerror());
+  assert.equal(await input.inputValue(),'');
+  console.log('PASS Classic checkout: reader wait, replacement, clearing and read-error recovery');
+  await page.setContent('<div id="blocks-fixture"></div>');await page.evaluate(installReader);
+  await page.addScriptTag({path:'/tmp/crmp-wp/wp-includes/js/dist/vendor/react.min.js'});
+  await page.addScriptTag({path:'/tmp/crmp-wp/wp-includes/js/dist/vendor/react-dom.min.js'});
+  await page.evaluate(()=>{window.wp={element:React};window.wc={wcSettings:{getSetting:()=>({methods:[{slug:'bank',title:'Bank',account:'PK001'}]})},wcBlocksRegistry:{registerPaymentMethod:config=>{window.blockConfig=config;}}};});
+  await page.addScriptTag({path:'assets/blocks.js'});
+  await page.evaluate(()=>{const eventRegistration={onPaymentSetup:cb=>{window.paymentSetup=cb;return ()=>{};}};window.blockRoot=ReactDOM.createRoot(document.getElementById('blocks-fixture'));blockRoot.render(React.createElement(blockConfig.content.type,{eventRegistration,emitResponse:{responseTypes:{SUCCESS:'success',ERROR:'error'}}}));});
+  const blockInput=page.locator('input[type=file]');await blockInput.waitFor();
+  await blockInput.setInputFiles(file('block-first.png'));
+  await page.waitForFunction(()=>window.paymentSetup&&paymentSetup().type==='error');
+  await blockInput.setInputFiles(file('block-second.png'));await page.evaluate(()=>readers[0].complete('data:image/png;base64,OLD'));
+  assert.equal(await page.evaluate(()=>paymentSetup().type),'error','Blocks must ignore stale completed readers');
+  await page.evaluate(()=>readers[1].complete('data:image/png;base64,NEW'));
+  await page.waitForFunction(()=>paymentSetup().type==='success');
+  assert.equal(await page.evaluate(()=>paymentSetup().meta.paymentMethodData.crmp_screenshot_data),'data:image/png;base64,NEW');
+  await blockInput.setInputFiles(file('block-third.png'));await blockInput.setInputFiles([]);await page.evaluate(()=>readers[2].complete('data:image/png;base64,CLEARED'));
+  await page.waitForFunction(()=>paymentSetup().type==='success'&&paymentSetup().meta.paymentMethodData.crmp_screenshot_data==='');
+  await blockInput.setInputFiles(file('block-error.png'));await page.evaluate(()=>readers[3].onerror());await page.waitForFunction(()=>paymentSetup().type==='error');
+  console.log('PASS Checkout Blocks: reader wait, replacement, clearing and read-error protection');
+ }finally{await browser.close();}
+})().catch(error=>{console.error(error);process.exit(1);});

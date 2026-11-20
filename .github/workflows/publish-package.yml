@@ -1,0 +1,26 @@
+name: Publish installable review package
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: publish-review-package
+  cancel-in-progress: false
+jobs:
+  package:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: v1.0.0
+      - name: Build and publish the production-only ZIP
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python3 tools/build-release.py
+          package=release-assets/cardraabta-manual-payments-for-woocommerce-v1.0.0.zip
+          (cd release-assets && sha256sum "$(basename "$package")") > "$package.sha256"
+          gh release upload v1.0.0 "$package" "$package.sha256" --clobber
+          python3 -c "from pathlib import Path; import hashlib; p=Path('release-assets/cardraabta-manual-payments-for-woocommerce-v1.0.0.zip'); Path('/tmp/crmp-release-notes.md').write_text(Path('release-assets/RELEASE-NOTES-1.0.0.md').read_text().replace('{{ZIP_SHA256}}',hashlib.sha256(p.read_bytes()).hexdigest()))"
+          gh release edit v1.0.0 --notes-file /tmp/crmp-release-notes.md --title "CardRaabta Manual Payments for WooCommerce 1.0.0"

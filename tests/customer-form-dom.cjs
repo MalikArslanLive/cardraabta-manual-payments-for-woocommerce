@@ -1,0 +1,13 @@
+const {JSDOM}=require('jsdom'),fs=require('fs'),assert=require('assert/strict');
+(async()=>{
+const dom=new JSDOM(fs.readFileSync('/tmp/crmp-customer-form.html','utf8'),{url:'https://shop.example.test/checkout/order-received/123/',runScripts:'outside-only'}),w=dom.window;
+w.HTMLElement.prototype.scrollIntoView=function(){};let sent=[];w.fetch=async(url,options)=>{sent.push(options.body);return{json:async()=>({success:false,data:{message:'Test validation response'}})}};
+w.crmpCheckout={maxUploadBytes:5*1024*1024};w.eval(fs.readFileSync(require('path').join(__dirname,'../assets/checkout.js'),'utf8'));
+const form=w.document.querySelector('.crmp-proof-form'),ref=form.querySelector('[name=crmp_transaction_ref]'),confirm=form.querySelector('[name=crmp_proof_confirm]'),file=form.querySelector('[type=file]');
+form.querySelector('[name=crmp_payment_date]').value='2026-01-01';ref.value='REF-TEST';form.dispatchEvent(new w.Event('submit',{bubbles:true,cancelable:true}));assert.equal(sent.length,0);assert(form.querySelector('.crmp-proof-feedback').textContent.includes('Confirm'));
+confirm.checked=true;form.querySelector('[name=crmp_payment_date]').value='2026-01-01';form.querySelector('[name=crmp_customer_note]').value='Paid from my bank';form.querySelector('[name=crmp_proof_method]').value='bank';
+const selected=new w.File(['sample'],'payment-proof.png',{type:'image/png'});Object.defineProperty(file,'files',{value:[selected],configurable:true});file.dispatchEvent(new w.Event('change',{bubbles:true}));assert.equal(form.querySelector('.crmp-upload-name').textContent,'payment-proof.png');assert.equal(form.querySelector('.crmp-upload-feedback').dataset.state,'selected');assert(form.querySelector('.crmp-upload-status').textContent.includes('Ready to upload'));
+form.dispatchEvent(new w.Event('submit',{bubbles:true,cancelable:true}));await new Promise(r=>setTimeout(r,15));assert.equal(sent.length,1);assert.equal(form.querySelector('.crmp-upload-feedback').dataset.state,'error');assert.equal(file.disabled,false);assert.equal(sent[0].get('crmp_customer_note'),'Paid from my bank');assert.equal(sent[0].get('crmp_payment_date'),'2026-01-01');assert.equal(sent[0].get('crmp_proof_method'),'bank');assert.equal(sent[0].get('crmp_proof_confirm'),'1');assert.equal(form.querySelector('[type=submit]').disabled,false);
+assert.equal(form.querySelectorAll('input[type=radio]').length,0);assert(form.querySelector('select[name=crmp_proof_method]'));
+w.close();console.log('PASS CUSTOMER FORM DOM: confirmation guard, native dropdown, filename, method/date/note payload and inline server feedback');
+})().catch(e=>{console.error(e);process.exit(1)});
